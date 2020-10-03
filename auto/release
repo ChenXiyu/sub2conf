@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+cd $(dirname $0)/..
+
+REPOSITORY=94xychen/sub2conf
+TAG=$(date +%Y%m%d%H%M%S)
+IMAGE=${REPOSITORY}:${TAG}
+
+docker build -t ${IMAGE} .
+
+docker push ${IMAGE}
+
+
+IMAGE_LATEST=${REPOSITORY}:latest
+
+docker tag ${IMAGE} ${IMAGE_LATEST}
+docker push ${IMAGE_LATEST}

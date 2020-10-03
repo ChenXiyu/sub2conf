@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+cd $(dirname $0)/..
+
+docker volume create ruby-gem-cache 2>&1 > /dev/null || ture
+
+docker-compose build dev
+
+docker-compose run dev 'bundle check || bundle install'
+docker-compose run dev "${@:-sh}"

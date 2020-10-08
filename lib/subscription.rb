@@ -22,8 +22,10 @@ class Subscription
 
   def contents
     Base64.decode64(row_content).split("\n").map do |vmess_address|
+      next unless vmess_address.start_with?('vmess://')
+
       JSON.parse(Base64.decode64(vmess_address.sub('vmess://', '')))
-    end
+    end.compact
   end
 
   def row_content

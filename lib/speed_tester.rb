@@ -8,7 +8,7 @@ module SpeedTester
   TEST_RESULT_DEST = '/tmp/result.ini'
 
   def start_test
-    `yes | #{SPEEDTESTER} /u #{url} /g ' ' 1>&2 && mv #{SPEEDTESTER_PATH}/results/*.log #{TEST_RESULT_DEST}`
+    `yes | #{SPEEDTESTER} /u #{url} /g ' ' 2>&1 >/dev/null && mv #{SPEEDTESTER_PATH}/results/*.log #{TEST_RESULT_DEST}`
   end
 
   def parse_result

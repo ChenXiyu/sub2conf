@@ -19,6 +19,8 @@ docker tag ${IMAGE} ${IMAGE_LATEST}
 docker push ${IMAGE_LATEST}
 
 # for arm v7
+auto/_setup_buildx
+
 IMAGE=${REPOSITORY}:arm-v7-${TAG}
 
 docker buildx build --platform linux/arm/v7 -t ${IMAGE} --build-arg ARCH=armhf --build-arg BASE_IMAGE=arm32v7/ruby:alpine .

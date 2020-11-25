@@ -19,7 +19,7 @@ docker tag ${IMAGE} ${IMAGE_LATEST}
 docker push ${IMAGE_LATEST}
 
 # # for arm v7
-# auto/_setup_buildx
+# [ "$CI" = "true" ] && auto/_setup_buildx
 
 # IMAGE=${REPOSITORY}:arm-v7-${TAG}
 

@@ -4,11 +4,13 @@ cd $(dirname $0)/..
 
 REPOSITORY=94xychen/sub2conf
 TAG=$(date +%Y%m%d%H%M%S)
+X86_BASE_IMAGE=ruby:alpine
+ARMV7_BASE_IMAGE=arm32v7/ruby:alpine
 
 # for X86
 
 IMAGE=${REPOSITORY}:${TAG}
-docker build -t ${IMAGE} --build-arg BASE_IMAGE=ruby:alpine --build-arg ARCH=linux64 .
+docker build -t ${IMAGE} --build-arg BASE_IMAGE=${X86_BASE_IMAGE} --build-arg ARCH=linux64 .
 
 docker push ${IMAGE}
 
@@ -22,7 +24,7 @@ docker push ${IMAGE_LATEST}
 
 IMAGE=${REPOSITORY}:arm-v7-${TAG}
 
-docker buildx build --platform linux/arm/v7 -t ${IMAGE} --output type=docker --build-arg ARCH=armhf --build-arg BASE_IMAGE=arm32v7/ruby:alpine .
+docker buildx build --platform linux/arm/v7 -t ${IMAGE} --output type=docker --build-arg ARCH=armhf --build-arg BASE_IMAGE=${ARMV7_BASE_IMAGE} .
 
 docker images
 

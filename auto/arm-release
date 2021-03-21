@@ -1,0 +1,11 @@
+#!/bin/bash -e
+cd $(dirname $0)/..
+
+# [ env != 'CI' ] && auto/_setup_buildx
+export BASE_IMAGE='arm32v7/ruby:alpine'
+export TAG_PREFIX='arm-v7-'
+export ARCH='armhf'
+export BUILD_CMD='docker buildx'
+export BUILD_PRAMETERS='--platform linux/arm/v7 --output type=docker'
+
+auto/_release

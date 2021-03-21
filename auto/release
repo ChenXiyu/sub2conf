@@ -1,5 +1,4 @@
 #!/bin/bash -ex
-
 cd $(dirname $0)/..
 
 REPOSITORY=94xychen/sub2conf
@@ -11,27 +10,22 @@ ARMV7_BASE_IMAGE=arm32v7/ruby:alpine
 
 IMAGE=${REPOSITORY}:${TAG}
 docker build -t ${IMAGE} --build-arg BASE_IMAGE=${X86_BASE_IMAGE} --build-arg ARCH=linux64 .
-
 docker push ${IMAGE}
 
-
 IMAGE_LATEST=${REPOSITORY}:latest
-
 docker tag ${IMAGE} ${IMAGE_LATEST}
 docker push ${IMAGE_LATEST}
 
-# for arm v7
+echo "${IMAGE}" | tee .artifacts.txt
 
+# for arm v7
 IMAGE=${REPOSITORY}:arm-v7-${TAG}
 
 docker buildx build --platform linux/arm/v7 -t ${IMAGE} --output type=docker --build-arg ARCH=armhf --build-arg BASE_IMAGE=${ARMV7_BASE_IMAGE} .
-
-docker images
-
 docker push ${IMAGE}
 
 IMAGE_LATEST=${REPOSITORY}:arm-v7-latest
-
 docker tag ${IMAGE} ${IMAGE_LATEST}
-
 docker push ${IMAGE_LATEST}
+
+echo "${IMAGE}" | tee -a .artifacts.txt

@@ -6,7 +6,7 @@ env:
   CI: true
 
 jobs:
-  build:
+  arm-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,22 +20,41 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN}}
-      - name: release
-        run: auto/release
+      - name: arm-release
+        run: auto/arm-release
       - name: upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: .artifacts.txt
+          name: arm-image
+          path: .artifacts.txt
+
+  x86-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN}}
+      - name: x86-release
+        run: auto/x86-release
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: x86-image
           path: .artifacts.txt
 
   security-check:
-    needs: build
+    needs:
+      - x86-release
+      - arm-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: download artifacts
         uses: actions/download-artifact@v2
-        with:
-          name: .artifacts.txt
+      - name: prepare for the artifacts
+        run: cat *-image/.artifacts.txt > .artifacts.txt
       - name: scan images
         run: auto/image-scan

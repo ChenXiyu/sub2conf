@@ -1,0 +1,7 @@
+#!/bin/bash -e
+cd $(dirname $0)/..
+export BASE_IMAGE=ruby:alpine
+export ARCH=armhf
+export BUILD_CMD='docker'
+
+auto/_release

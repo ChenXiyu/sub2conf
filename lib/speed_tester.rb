@@ -1,4 +1,5 @@
 require 'inifile'
+require_relative 'log'
 
 module SpeedTester
   private
@@ -8,19 +9,32 @@ module SpeedTester
   TEST_RESULT_DEST = '/tmp/result.ini'
 
   def start_test
-    `yes | #{SPEEDTESTER} /u #{url} /g ' ' 2>&1 >/dev/null && mv #{SPEEDTESTER_PATH}/results/*.log #{TEST_RESULT_DEST}`
+    Log.warning "Speed testing started..."
+    @start_test ||= `yes | #{SPEEDTESTER} /u #{url} /g ' ' 1>&2 && mv #{SPEEDTESTER_PATH}/results/*.log #{TEST_RESULT_DEST}`
+    Log.ok "Speed testing complested!"
   end
 
   def parse_result
     IniFile.load("#{TEST_RESULT_DEST}").to_h
   end
 
-  def test_results
-    return @test_results unless @test_results.nil?
-
+  def available_node_names
+    return @available_node_names unless @available_node_names.nil?
     start_test
-    @test_results = parse_result.filter do |section, detials|
-      detials['Online']
-    end
+
+    online_nodes = parse_result.filter(&online?)
+    @available_node_names = top_3(online_nodes).map(&node_name)
+  end
+
+  def node_name
+    lambda {|node| node.first }
+  end
+
+  def online?
+    lambda {|_, details| details['Online']}
+  end
+
+  def top_3(nodes)
+    nodes.to_a.sort_by {|node| node.last["AvgSpeed"].slice(0...-2).to_i}.reverse.slice(0...3)
   end
 end

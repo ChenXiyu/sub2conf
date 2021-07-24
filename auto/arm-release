@@ -2,7 +2,7 @@
 cd $(dirname $0)/..
 
 # [ env != 'CI' ] && auto/_setup_buildx
-export BASE_IMAGE='arm32v7/ruby:alpine'
+export BASE_IMAGE='arm32v7/ruby:3-slim'
 export TAG_PREFIX='arm-v7-'
 export ARCH='armhf'
 export BUILD_CMD='docker buildx'

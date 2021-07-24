@@ -7,7 +7,7 @@ WORKDIR /app
 
 ENV STAIRSPEEDTEST_VERSION v0.7.1
 
-RUN apk add wget build-base
+RUN apt update && apt install wget build-essential -y
 
 # install stairspeedtest
 RUN wget https://github.com/tindy2013/stairspeedtest-reborn/releases/download/${STAIRSPEEDTEST_VERSION}/stairspeedtest_reborn_${ARCH}.tar.gz \

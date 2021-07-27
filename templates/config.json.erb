@@ -23,8 +23,7 @@
       },
       "streamSettings": {
         "sockopt": {
-          "tproxy": "tproxy",
-          "mark": 255
+          "tproxy": "tproxy"
         }
       }
     },
@@ -147,7 +146,9 @@
         "domains": [
           "geosite:cn",
           "ntp.org",
-          "e2fa7d28-a156-48d6-8550-5b71cd1c0157.94xychen.net"
+          <% addresses.each_with_index do |address, index| %>
+          "<%= address %>"<% if index != (addresses.size - 1) %>,<% end %>
+          <% end %>
         ]
       }
     ]

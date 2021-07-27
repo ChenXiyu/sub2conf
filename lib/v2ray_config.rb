@@ -25,4 +25,8 @@ class V2rayConfig
       }
     end
   end
+
+  def addresses
+    @addresses ||= outbounds.map {|outbound| outbound['address']}.uniq
+  end
 end

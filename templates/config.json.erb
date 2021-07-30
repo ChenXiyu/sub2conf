@@ -50,6 +50,7 @@
     }
   ],
   "outbounds": [
+  <% outbounds.each_with_index do |outbound, index| %>
     {
       "streamSettings": {
         "security": "none",
@@ -59,22 +60,22 @@
         "sockopt": {
           "mark": 255
         },
-        "network": "tcp",
+        "network": "<%= outbound['network'] || 'tcp' %>",
         "wsSettings": {
-          "path": "",
+          "path": "<%= outbound.dig('ws', 'path') || "" %>",
           "headers": {
-            "host": ""
+            "host": "<%= outbound.dig('ws', 'host') || "" %>"
           }
         }
       },
-      "tag": "proxy",
+      "tag": "proxy-<%= index %>",
       "protocol": "vmess",
       "mux": {
-        "enabled": false
+        "enabled": true,
+        "concurrency": 20
       },
       "settings": {
         "vnext": [
-        <% outbounds.each_with_index do |outbound, index| %>
           {
             "port": <%= outbound['port'] %>,
             "users": [
@@ -84,11 +85,11 @@
               }
             ],
             "address": "<%= outbound['address'] %>"
-          }<% if index != (outbounds.size - 1) %>,<% end %>
-        <% end %>
+          }
         ]
       }
     },
+  <% end %>
     {
       "tag": "direct",
       "protocol": "freedom",
@@ -168,14 +169,14 @@
         "domain": [
           "amazom.com"
         ],
-        "outboundTag": "proxy"
+        "balancerTag": "proxies"
       },
       {
         "type": "field",
         "domain": [
           "geolocation-!cn"
         ],
-        "outboundTag": "proxy"
+        "balancerTag": "proxies"
       },
       {
         "type": "field",
@@ -209,7 +210,7 @@
           "8.8.8.8",
           "1.1.1.1"
         ],
-        "outboundTag": "proxy"
+        "balancerTag": "proxies"
       },
       {
         "type": "field",
@@ -237,6 +238,12 @@
           "geosite:cn"
         ],
         "outboundTag": "direct"
+      }
+    ],
+    "balancers": [
+      {
+        "tag": "proxies",
+        "selector": ["proxy"]
       }
     ]
   }

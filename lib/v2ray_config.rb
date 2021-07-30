@@ -21,7 +21,13 @@ class V2rayConfig
         'address' => raw_outbound['add'],
         'id' => raw_outbound['id'],
         'port' => raw_outbound['port'],
-        'alter_id' => raw_outbound['aid']
+        'alter_id' => raw_outbound['aid'],
+        'network' => raw_outbound['net'],
+        'lts'=> raw_outbound['lts'],
+        'ws'=> {
+          'host' => raw_outbound['host'],
+          'path' => raw_outbound['path'],
+        }
       }
     end
   end

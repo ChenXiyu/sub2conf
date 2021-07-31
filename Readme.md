@@ -7,13 +7,14 @@ This is a tool to let you be able to convert a v2ray subscription into a v2ray c
 
 # Usage
 ```Bash
-docker run --rm -it 94xychen/sub2conf [subscription link]
+docker run --rm -it 94xychen/sub2conf --subscription_url [subscription link] --output [path of configuration file] --speed_testing
 ```
 
-The output will be the json formated configuration, You can either just copy this config into your config file or you can use the script and cron mechanism to refresh the configuration schedulely like what I've done:
+The converted configuration will be placed to the filr path you specified to the "--output" option. And you can use the script and cron mechanism to refresh the configuration schedulely like what I've done:
 
 ```Bash
 #!/bin/bash
+#file: /root/refresh_subscriptions.sh
 set -ue
 set -o pipefail
 
@@ -37,16 +38,23 @@ function assert_active {
 
 trap 'assert_active' ERR
 
-v2ray_config_path='/usr/local/etc/v2ray/config.json'
+v2ray_config_path='/etc/v2ray/config.json'
 
-# Back the origin config
+# Back the origin config up
 cp ${v2ray_config_path} ${v2ray_config_path}.back
 
-/usr/bin/docker run --rm -it --network host 94xychen/sub2conf:arm-v7-latest '[your subscription link]' > ${v2ray_config_path}
+/usr/bin/docker run --rm -it --network host -v /etc/v2ray/:/etc/v2ray 94xychen/sub2conf:latest --subscription_url "$1" --output ${v2ray_config_path} --speed_testing
 
 restart_v2ray
 
 assert_active
+```
+
+And
+
+```
+#crontab
+0 5 1 * * /root/refresh_subscriptions.sh [your subscription url] >> /var/log/refresh_subscriptions.log
 ```
 
 ## TODO

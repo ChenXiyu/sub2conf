@@ -12,7 +12,8 @@ class Subscription
     @url = url
   end
 
-  def available_nodes
+  def available_nodes(speed_testing)
+    return contents unless speed_testing
     contents.filter{ |node| available_node_names.include?(" ^#{node['ps']}") }
   end
 

@@ -13,7 +13,7 @@ docker run --rm -it 94xychen/sub2conf --subscription_url [subscription link] --o
 The converted configuration will be placed to the filr path you specified to the "--output" option. And you can use the script and cron mechanism to refresh the configuration schedulely like what I've done:
 
 ```Bash
-#!/bin/bash
+#!/bin/bash -e
 #file: /root/refresh_subscriptions.sh
 set -ue
 set -o pipefail
@@ -22,39 +22,46 @@ function restart_v2ray {
   /bin/systemctl restart v2ray
 }
 
+function backup {
+  cp "$1" "$1.back"
+}
+
 function roll_back {
-  mv ${v2ray_config_path}.back ${v2ray_config_path}
+  mv "$1.back" "$1"
   restart_v2ray
 }
 
 function assert_active {
   sleep 10
-  if [ "$(/bin/systemctl is-active v2ray)" != 'active' ]
-  then
-    roll_back
-    # TODO notify
-  fi
+  [ "$(/bin/systemctl is-active v2ray)" != 'active' ] && roll_back "$v2ray_config"
 }
 
-trap 'assert_active' ERR
+function refresh_config {
+  local v2ray_config=$1
+  local sub_url=$2
+  local v2ray_config_dir=`dirname $v2ray_config`
 
-v2ray_config_path='/etc/v2ray/config.json'
+  /usr/bin/docker run --rm -it --network host -v "$v2ray_config_dir":"$v2ray_config_dir" 94xychen/sub2conf --subscription_url "$sub_url" --output "$v2ray_config" --speed_testing
+}
 
-# Back the origin config up
-cp ${v2ray_config_path} ${v2ray_config_path}.back
+v2ray_config=$1
+sub_url=$2
 
-/usr/bin/docker run --rm -it --network host -v /etc/v2ray/:/etc/v2ray 94xychen/sub2conf:latest --subscription_url "$1" --output ${v2ray_config_path} --speed_testing
+trap 'assert_active' EXIT
+
+backup "$v2ray_config"
+
+refresh_config "$v2ray_config" "$sub_url"
 
 restart_v2ray
-
-assert_active
 ```
 
 And
 
 ```
 #crontab
-0 5 1 * * /root/refresh_subscriptions.sh [your subscription url] >> /var/log/refresh_subscriptions.log
+0 5 * * 1 /root/refresh_subscriptions.sh "/path/of/v2ray/config/file" "[your subscription url]" >>/var/log/refresh_subscriptions.log 2>&1
+
 ```
 
 ## TODO

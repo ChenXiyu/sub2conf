@@ -13,6 +13,7 @@ class Subscription
 
   def available_nodes(speed_testing)
     return contents unless speed_testing
+    Log.ok "top3 nodes: #{available_node_names}"
     contents.filter{ |node| available_node_names.include?(" ^#{node['ps']}") }
   end
 

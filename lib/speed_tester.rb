@@ -35,6 +35,19 @@ module SpeedTester
   end
 
   def top_3(nodes)
-    nodes.to_a.sort_by {|node| node.last["AvgSpeed"].slice(0...-2).to_i}.reverse.slice(0...3)
+    nodes.to_a.sort_by {|node| to_KB(node.last["AvgSpeed"])}.reverse.slice(0...3)
+  end
+
+  def to_KB(rate)
+    unit = rate.slice(-2...-1).downcase
+    number = rate.slice(0...-2).to_f
+    case unit
+    when 'm'
+      number * 1000
+    when 'g'
+      number * 1000 * 1000
+    else
+      number
+    end
   end
 end

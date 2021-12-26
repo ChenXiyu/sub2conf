@@ -3,7 +3,6 @@ require 'base64'
 require 'json'
 require_relative './speed_tester'
 require_relative './log'
-require 'pry'
 
 class Subscription
   include SpeedTester

@@ -1,7 +1,0 @@
-#!/bin/bash -e
-cd $(dirname $0)/..
-export BASE_IMAGE=ruby:3-slim
-export ARCH=linux64
-export BUILD_CMD='docker'
-
-auto/_release
